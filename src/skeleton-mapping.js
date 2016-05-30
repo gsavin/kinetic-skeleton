@@ -11,13 +11,30 @@ class SkeletonMapping extends THREE.Group {
     skeleton.on('update', this.updateMapping.bind(this));
   }
 
-  addShape(bone, def, material = null) {
+  addShape(bone, def, rotation = null, translation = null, material = null) {
     if (material == null) {
       material = this._material;
     }
 
     let s = new THREE.Mesh(def.shape(), material);
-    s.position.z = def.z;
+
+    if (rotation != null) {
+      s.rotation.x = rotation[0];
+      s.rotation.y = rotation[1];
+      s.rotation.z = rotation[2];
+
+      let g = new THREE.Group();
+      g.add(s);
+      s = g;
+    }
+
+    if (translation != null) {
+      s.translateX(translation[0]);
+      s.translateY(translation[1]);
+      s.translateZ(translation[2]);
+    }
+
+    //s.position.z = def.z;
 
     this._meshes.push({bone:this._skeleton.getBone(bone), mesh:s});
     this.add(s);

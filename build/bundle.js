@@ -69,32 +69,71 @@
 	    skelMesh = new THREE.Group(),
 	    showSkel = false;
 
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setClearColor(0x21252b);
-	//renderer.setClearColor(0x282c34);
-
-	var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-	directionalLight.position.set(1, 0, 1).normalize();
-	scene.add(directionalLight);
-
-	document.body.appendChild(renderer.domElement);
+	//
+	// Create the 3d Object
+	//
 
 	var shapeMaterial = new THREE.MeshLambertMaterial({
 	  color: 0xefefef,
 	  wireframe: false
 	});
 
+	shapeMaterial.transparent = true;
+	shapeMaterial.opacity = 0.75;
+
+	scene.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
+
 	var skelMapping = new SkeletonMapping(skel, shapeMaterial);
 
-	skelMapping.addShape("j", shapes.driveBarUpper);
-	skelMapping.addShape("k", shapes.driveBarLower);
-	skelMapping.addShape("c", shapes.legConnectorInside);
-	skelMapping.addShape("f", shapes.legConnectorOutside);
-	skelMapping.addShape("b", shapes.shoulder);
-	skelMapping.addShape("m", shapes.driveWheelBar);
-	skelMapping.addShape("g", shapes.foot);
+	skelMapping.addShape("j", shapes.driveBarUpper, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping.addShape("k", shapes.driveBarLower, null, [0, 0, 5 * shapes.thickness]);
+	skelMapping.addShape("c", shapes.legConnectorInside, null, [0, 0, 4 * shapes.thickness]);
+	skelMapping.addShape("f", shapes.legConnectorOutside, null, [0, 0, 4 * shapes.thickness]);
+	skelMapping.addShape("b", shapes.shoulder, null, [0, 0, 2 * shapes.thickness]);
+	skelMapping.addShape("m", shapes.driveWheelBar, null, [0, 0, 1 * shapes.thickness]);
+	skelMapping.addShape("g", shapes.foot, null, [0, 0, 2 * shapes.thickness]);
+	skelMapping.addShape("b", shapes.spacer, null, [0, 0, 1 * shapes.thickness]);
+	skelMapping.addShape("b", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping.addShape("g", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping.addShape("f", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
+
+	skelMapping.addShape("j'", shapes.driveBarUpper, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
+	skelMapping.addShape("k'", shapes.driveBarLower, [Math.PI, 0, 0], [0, 0, 4 * shapes.thickness]);
+	skelMapping.addShape("c'", shapes.legConnectorInside, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
+	skelMapping.addShape("f'", shapes.legConnectorOutside, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
+	skelMapping.addShape("b'", shapes.shoulder, [Math.PI, 0, 0], [0, 0, 3 * shapes.thickness]);
+	skelMapping.addShape("g'", shapes.foot, [Math.PI, 0, 0], [0, 0, 3 * shapes.thickness]);
+	skelMapping.addShape("b'", shapes.spacer, null, [0, 0, 1 * shapes.thickness]);
 
 	scene.add(skelMapping);
+
+	/*var shapeMaterial2 = new THREE.MeshLambertMaterial({
+	  color: 0xff0000,
+	  wireframe: false
+	});
+
+	let s1 = new THREE.Mesh(shapes.foot.shape(), shapeMaterial)
+	  , s2 = new THREE.Mesh(shapes.foot.shape(), shapeMaterial2);
+
+	s2.rotation.x = -Math.PI;
+
+	let g1 = new THREE.Group()
+	  , g2 = new THREE.Group();
+
+	g1.add(s1);
+	g2.add(s2);
+
+	g1.rotation.z = Math.PI / 2;
+	g2.rotation.z = Math.PI / 2;
+
+	g2.translateZ(10);
+
+	scene.add(g1);
+	scene.add(g2);*/
+
+	//
+	// Draw skeleton
+	//
 
 	if (showSkel) {
 	  var skeletonMaterial = new THREE.LineBasicMaterial({
@@ -105,6 +144,14 @@
 	  var _skelMesh = new SkeletonMesh(skel, skeletonMaterial);
 	  scene.add(_skelMesh);
 	}
+
+	//
+	// Light, camera, controls...
+	//
+
+	var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+	directionalLight.position.set(1, 0, 1).normalize();
+	scene.add(directionalLight);
 
 	camera.position.y = -25;
 	camera.position.z = 125;
@@ -124,6 +171,23 @@
 	controls.staticMoving = false;
 	controls.dynamicDampingFactor = 0.3;*/
 
+	window.addEventListener('resize', onWindowResize, false);
+
+	function onWindowResize() {
+	  camera.aspect = window.innerWidth / window.innerHeight;
+	  camera.updateProjectionMatrix();
+	  renderer.setSize(window.innerWidth, window.innerHeight);
+	  //controls.handleResize();
+
+	  render();
+	}
+
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setClearColor(0x21252b);
+	//renderer.setClearColor(0x282c34);
+
+	document.body.appendChild(renderer.domElement);
+
 	var i = -1;
 
 	function render() {
@@ -141,17 +205,6 @@
 	i = setInterval(function () {
 	  requestAnimationFrame(render);
 	}, 1000 / fps);
-
-	window.addEventListener('resize', onWindowResize, false);
-
-	function onWindowResize() {
-	  camera.aspect = window.innerWidth / window.innerHeight;
-	  camera.updateProjectionMatrix();
-	  renderer.setSize(window.innerWidth, window.innerHeight);
-	  controls.handleResize();
-
-	  render();
-	}
 
 /***/ },
 /* 1 */
@@ -542,24 +595,21 @@
 
 	    _this.addArticulation("0", [0, 0]).addArticulation("1", function (skeleton) {
 	      return [15 * Math.cos(skeleton.get("rotation")), 15 * Math.sin(skeleton.get("rotation"))];
-	    }).addArticulation("2", [-38.0, -7.8]).addArticulation("3").addArticulation("4").addArticulation("5").addArticulation("6")
+	    }).addArticulation("2", [-38.0, -7.8]).addArticulation("3").addArticulation("4").addArticulation("5").addArticulation("6").addArticulation("2'", [38.0, -7.8]).addArticulation("3'").addArticulation("4'").addArticulation("5'").addArticulation("6'")
 	    //.addArticulation("7")
 	    //
 	    // Bones
 	    //
-	    //  .addBone("a", 38.0)
-	    .addBone("b", "2", "3", 41.5).addBone("c", "2", "4", 39.3).addBone("d", "2", "6", 40.1).addBone("e", "3", "6", 55.8).addBone("f", "5", "6", 39.4).addBone("g", "4", "5", 36.7)
+	    .addBone("b", "2", "3", 41.5).addBone("c", "2", "4", 39.3).addBone("d", "2", "6", 40.1).addBone("e", "3", "6", 55.8).addBone("f", "5", "6", 39.4).addBone("g", "4", "5", 36.7).addBone("j", "1", "3", 50.0).addBone("k", "1", "4", 61.9).addBone("m", "0", "1", 15.0)
+	    //.addBone("a", 38.0)
 	    //.addBone("h", "5", "7", 65.7)
 	    //.addBone("i", "4", "7", 49.0)
-	    .addBone("j", "1", "3", 50.0).addBone("k", "1", "4", 61.9)
-	    //  .addBone("l", 7.8)
-	    .addBone("m", "0", "1", 15.0)
+	    //.addBone("l", 7.8)
+	    .addBone("b'", "2'", "3'", 41.5).addBone("c'", "2'", "4'", 39.3).addBone("d'", "2'", "6'", 40.1).addBone("e'", "3'", "6'", 55.8).addBone("f'", "5'", "6'", 39.4).addBone("g'", "4'", "5'", 36.7).addBone("j'", "1", "3'", 50.0).addBone("k'", "1", "4'", 61.9)
 	    //
 	    // Triangles
 	    //
-	    .addTriangle("1", "2", "3").addTriangle("1", "4", "2").addTriangle("3", "2", "6").addTriangle("2", "4", "5")
-	    //.addTriangle("4", "7", "5")
-	    .addTriangle("2", "5", "6").addTriangle("4", "5", "6");
+	    .addTriangle("1", "2", "3").addTriangle("1", "4", "2").addTriangle("3", "2", "6").addTriangle("2", "4", "5").addTriangle("2", "5", "6").addTriangle("4", "5", "6").addTriangle("1", "3'", "2'").addTriangle("1", "2'", "4'").addTriangle("3'", "6'", "2'").addTriangle("2'", "5'", "4'").addTriangle("2'", "6'", "5'").addTriangle("4'", "6'", "5'");
 	    return _this;
 	  }
 
@@ -5374,6 +5424,13 @@
 	  amount: thickness
 	};
 
+	function extrude(shape) {
+	  var g = shape.extrude(extrudeSettings);
+	  g.translate(0, 0, -thickness / 2);
+
+	  return g;
+	}
+
 	function driveBarUpper() {
 	  var shape = new THREE.Shape();
 	  shape.moveTo(0, 6);
@@ -5392,7 +5449,7 @@
 	  leftHole.absarc(50, 0, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(leftHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
 	}
 
 	function driveBarLower() {
@@ -5413,7 +5470,7 @@
 	  leftHole.absarc(61.9, 0, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(leftHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
 	}
 
 	function legConnectorInside() {
@@ -5436,7 +5493,7 @@
 	  leftHole.absarc(x, 0, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(leftHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
 	}
 
 	function legConnectorOutside() {
@@ -5459,7 +5516,7 @@
 	  leftHole.absarc(x, 0, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(leftHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
 	}
 
 	function shoulder() {
@@ -5470,7 +5527,7 @@
 	  shape.lineTo(x, -6);
 	  shape.quadraticCurveTo(x + 6, -6, x + 6, 0);
 	  shape.quadraticCurveTo(x + 6, 6, x, 6);
-	  shape.lineTo(8.60, 40.01);
+	  shape.quadraticCurveTo(15, 15, 8.60, 40.01);
 	  shape.quadraticCurveTo(8.60, 46.01, 2.60, 46.01);
 	  shape.quadraticCurveTo(-4.60, 46.01, -4.60, 40.01);
 	  shape.lineTo(0, 6);
@@ -5489,7 +5546,7 @@
 	  thirdHole.absarc(2.60, 40.01, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(thirdHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
 	}
 
 	function driveWheelBar() {
@@ -5512,7 +5569,7 @@
 	  leftHole.absarc(x, 0, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(leftHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
 	}
 
 	function foot() {
@@ -5537,7 +5594,51 @@
 	  leftHole.absarc(x, 0, 3, 0, Math.PI * 2, true);
 	  shape.holes.push(leftHole);
 
-	  return shape.extrude(extrudeSettings);
+	  return extrude(shape);
+	}
+
+	function support() {
+	  var shape = new THREE.Shape(),
+	      x = 41.5;
+
+	  /*shape.moveTo(-50, -7.8);
+	  shape.quadraticCurveTo(0, 26, 50, -7.8);
+	  shape.bezierCurveTo(38, -20, -38, -20, -50, -7.8);*/
+	  shape.moveTo(-6, 0);
+	  shape.quadraticCurveTo(-6, 6, 0, 6);
+	  shape.quadraticCurveTo(6, 6, 6, 0);
+	  shape.lineTo(38, -1.8);
+	  shape.quadraticCurveTo(44, -1.8, 44, -7.8);
+	  shape.quadraticCurveTo(44, -13.8, 38, -13.8);
+	  shape.quadraticCurveTo(0, 3, -38, -13.8);
+	  shape.quadraticCurveTo(-44, -13.8, -44, -7.8);
+	  shape.quadraticCurveTo(-44, -1.8, -38, -1.8);
+	  shape.lineTo(-6, 0);
+
+	  var rightHole = new THREE.Path();
+	  rightHole.absarc(38, -7.8, 3, 0, Math.PI * 2, true);
+	  shape.holes.push(rightHole);
+
+	  var leftHole = new THREE.Path();
+	  leftHole.absarc(-38, -7.8, 3, 0, Math.PI * 2, true);
+	  shape.holes.push(leftHole);
+
+	  var thirdHole = new THREE.Path();
+	  thirdHole.absarc(0, 0, 3, 0, Math.PI * 2, true);
+	  shape.holes.push(thirdHole);
+
+	  return extrude(shape);
+	}
+
+	function spacer() {
+	  var shape = new THREE.Shape();
+	  shape.absarc(0, 0, 6, 0, Math.PI * 2, true);
+
+	  var hole = new THREE.Path();
+	  hole.absarc(0, 0, 3, 0, Math.PI * 2, true);
+	  shape.holes.push(hole);
+
+	  return extrude(shape);
 	}
 
 	module.exports = {
@@ -5568,7 +5669,16 @@
 	  foot: {
 	    shape: foot,
 	    z: 2 * thickness
-	  }
+	  },
+	  support: {
+	    shape: support,
+	    z: 0
+	  },
+	  spacer: {
+	    shape: spacer,
+	    z: 0
+	  },
+	  thickness: thickness
 	};
 
 /***/ },
@@ -5620,7 +5730,7 @@
 	    var _iteratorError = undefined;
 
 	    try {
-	      for (var _iterator = (0, _getIterator3.default)(skel.bones()), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      for (var _iterator = (0, _getIterator3.default)(_this.skeleton.bones()), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	        var bone = _step.value;
 
 	        var geometry = new THREE.Geometry();
@@ -5743,14 +5853,33 @@
 	  (0, _createClass3.default)(SkeletonMapping, [{
 	    key: 'addShape',
 	    value: function addShape(bone, def) {
-	      var material = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	      var rotation = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	      var translation = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+	      var material = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
 
 	      if (material == null) {
 	        material = this._material;
 	      }
 
 	      var s = new THREE.Mesh(def.shape(), material);
-	      s.position.z = def.z;
+
+	      if (rotation != null) {
+	        s.rotation.x = rotation[0];
+	        s.rotation.y = rotation[1];
+	        s.rotation.z = rotation[2];
+
+	        var g = new THREE.Group();
+	        g.add(s);
+	        s = g;
+	      }
+
+	      if (translation != null) {
+	        s.translateX(translation[0]);
+	        s.translateY(translation[1]);
+	        s.translateZ(translation[2]);
+	      }
+
+	      //s.position.z = def.z;
 
 	      this._meshes.push({ bone: this._skeleton.getBone(bone), mesh: s });
 	      this.add(s);

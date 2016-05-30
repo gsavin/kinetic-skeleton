@@ -33,17 +33,58 @@ var shapeMaterial = new THREE.MeshLambertMaterial({
   wireframe: false
 });
 
+shapeMaterial.transparent = true;
+shapeMaterial.opacity = 0.75;
+
+scene.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
+
 let skelMapping = new SkeletonMapping(skel, shapeMaterial);
 
-skelMapping.addShape("j", shapes.driveBarUpper);
-skelMapping.addShape("k", shapes.driveBarLower);
-skelMapping.addShape("c", shapes.legConnectorInside);
-skelMapping.addShape("f", shapes.legConnectorOutside);
-skelMapping.addShape("b", shapes.shoulder);
-skelMapping.addShape("m", shapes.driveWheelBar);
-skelMapping.addShape("g", shapes.foot);
+skelMapping.addShape("j", shapes.driveBarUpper          , null              , [0, 0, 3 * shapes.thickness]);
+skelMapping.addShape("k", shapes.driveBarLower          , null              , [0, 0, 5 * shapes.thickness]);
+skelMapping.addShape("c", shapes.legConnectorInside     , null              , [0, 0, 4 * shapes.thickness]);
+skelMapping.addShape("f", shapes.legConnectorOutside    , null              , [0, 0, 4 * shapes.thickness]);
+skelMapping.addShape("b", shapes.shoulder               , null              , [0, 0, 2 * shapes.thickness]);
+skelMapping.addShape("m", shapes.driveWheelBar          , null              , [0, 0, 1 * shapes.thickness]);
+skelMapping.addShape("g", shapes.foot                   , null              , [0, 0, 2 * shapes.thickness]);
+skelMapping.addShape("b", shapes.spacer                 , null              , [0, 0, 1 * shapes.thickness]);
+skelMapping.addShape("b", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+skelMapping.addShape("g", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+skelMapping.addShape("f", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+
+skelMapping.addShape("j'", shapes.driveBarUpper         , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
+skelMapping.addShape("k'", shapes.driveBarLower         , [Math.PI, 0, 0]   , [0, 0, 4 * shapes.thickness]);
+skelMapping.addShape("c'", shapes.legConnectorInside    , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
+skelMapping.addShape("f'", shapes.legConnectorOutside   , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
+skelMapping.addShape("b'", shapes.shoulder              , [Math.PI, 0, 0]   , [0, 0, 3 * shapes.thickness]);
+skelMapping.addShape("g'", shapes.foot                  , [Math.PI, 0, 0]   , [0, 0, 3 * shapes.thickness]);
+skelMapping.addShape("b'", shapes.spacer                , null              , [0, 0, 1 * shapes.thickness]);
 
 scene.add(skelMapping);
+
+/*var shapeMaterial2 = new THREE.MeshLambertMaterial({
+  color: 0xff0000,
+  wireframe: false
+});
+
+let s1 = new THREE.Mesh(shapes.foot.shape(), shapeMaterial)
+  , s2 = new THREE.Mesh(shapes.foot.shape(), shapeMaterial2);
+
+s2.rotation.x = -Math.PI;
+
+let g1 = new THREE.Group()
+  , g2 = new THREE.Group();
+
+g1.add(s1);
+g2.add(s2);
+
+g1.rotation.z = Math.PI / 2;
+g2.rotation.z = Math.PI / 2;
+
+g2.translateZ(10);
+
+scene.add(g1);
+scene.add(g2);*/
 
 //
 // Draw skeleton
@@ -91,7 +132,7 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
-  controls.handleResize();
+  //controls.handleResize();
 
   render();
 }

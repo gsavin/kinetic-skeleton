@@ -8,7 +8,7 @@ class SkeletonMesh extends THREE.Group {
     this.material = material;
     this.lines = {};
 
-    for (let bone of skel.bones()) {
+    for (let bone of this.skeleton.bones()) {
       let geometry = new THREE.Geometry();
 
       geometry.vertices.push(

@@ -7,6 +7,13 @@ const extrudeSettings = {
 	amount: thickness
 };
 
+function extrude(shape) {
+  let g = shape.extrude(extrudeSettings);
+  g.translate(0, 0, -thickness / 2);
+
+  return g;
+}
+
 function driveBarUpper() {
   let shape = new THREE.Shape();
   shape.moveTo(0, 6);
@@ -25,7 +32,7 @@ function driveBarUpper() {
 	leftHole.absarc(50, 0, 3, 0, Math.PI*2, true);
 	shape.holes.push(leftHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
 }
 
 function driveBarLower() {
@@ -46,7 +53,7 @@ function driveBarLower() {
 	leftHole.absarc(61.9, 0, 3, 0, Math.PI*2, true);
 	shape.holes.push(leftHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
 }
 
 function legConnectorInside() {
@@ -69,7 +76,7 @@ function legConnectorInside() {
 	leftHole.absarc(x, 0, 3, 0, Math.PI*2, true);
 	shape.holes.push(leftHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
 }
 
 function legConnectorOutside() {
@@ -92,7 +99,7 @@ function legConnectorOutside() {
 	leftHole.absarc(x, 0, 3, 0, Math.PI*2, true);
 	shape.holes.push(leftHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
 }
 
 function shoulder() {
@@ -103,7 +110,7 @@ function shoulder() {
   shape.lineTo(x, -6);
   shape.quadraticCurveTo(x + 6, -6, x + 6, 0);
   shape.quadraticCurveTo(x + 6,  6, x, 6);
-  shape.lineTo(8.60, 40.01);
+  shape.quadraticCurveTo(15, 15, 8.60, 40.01);
   shape.quadraticCurveTo(8.60, 46.01, 2.60, 46.01);
   shape.quadraticCurveTo(-4.60, 46.01, -4.60, 40.01);
   shape.lineTo(0, 6);
@@ -122,7 +129,7 @@ function shoulder() {
 	thirdHole.absarc(2.60, 40.01, 3, 0, Math.PI*2, true);
 	shape.holes.push(thirdHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
 }
 
 function driveWheelBar() {
@@ -145,7 +152,7 @@ function driveWheelBar() {
 	leftHole.absarc(x, 0, 3, 0, Math.PI*2, true);
 	shape.holes.push(leftHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
 }
 
 function foot() {
@@ -170,7 +177,51 @@ function foot() {
 	leftHole.absarc(x, 0, 3, 0, Math.PI*2, true);
 	shape.holes.push(leftHole);
 
-  return shape.extrude(extrudeSettings);
+  return extrude(shape);
+}
+
+function support() {
+  let shape = new THREE.Shape()
+    , x = 41.5;
+
+  /*shape.moveTo(-50, -7.8);
+  shape.quadraticCurveTo(0, 26, 50, -7.8);
+  shape.bezierCurveTo(38, -20, -38, -20, -50, -7.8);*/
+  shape.moveTo(-6, 0);
+  shape.quadraticCurveTo(-6, 6, 0, 6);
+  shape.quadraticCurveTo(6, 6, 6, 0);
+  shape.lineTo(38, -1.8);
+  shape.quadraticCurveTo(44, -1.8, 44, -7.8);
+  shape.quadraticCurveTo(44, -13.8, 38, -13.8);
+  shape.quadraticCurveTo(0, 3, -38, -13.8);
+  shape.quadraticCurveTo(-44, -13.8, -44, -7.8);
+  shape.quadraticCurveTo(-44, -1.8, -38, -1.8);
+  shape.lineTo(-6, 0);
+
+  let rightHole = new THREE.Path();
+	rightHole.absarc(38, -7.8, 3, 0, Math.PI*2, true);
+	shape.holes.push(rightHole);
+
+  let leftHole = new THREE.Path();
+	leftHole.absarc(-38, -7.8, 3, 0, Math.PI*2, true);
+	shape.holes.push(leftHole);
+
+  let thirdHole = new THREE.Path();
+	thirdHole.absarc(0, 0, 3, 0, Math.PI*2, true);
+	shape.holes.push(thirdHole);
+
+  return extrude(shape);
+}
+
+function spacer() {
+  let shape = new THREE.Shape();
+	shape.absarc(0, 0, 6, 0, Math.PI*2, true);
+
+  let hole = new THREE.Path();
+	hole.absarc(0, 0, 3, 0, Math.PI*2, true);
+	shape.holes.push(hole);
+
+  return extrude(shape);
 }
 
 module.exports = {
@@ -201,5 +252,14 @@ module.exports = {
   foot: {
     shape: foot,
     z: 2 * thickness
-  }
+  },
+  support: {
+    shape: support,
+    z: 0
+  },
+  spacer: {
+    shape: spacer,
+    z: 0
+  },
+  thickness: thickness
 };
