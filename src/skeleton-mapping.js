@@ -8,7 +8,9 @@ class SkeletonMapping extends THREE.Group {
     this._material = material;
     this._meshes = [];
 
-    skeleton.on('update', this.updateMapping.bind(this));
+    this.updateMapping = this.updateMapping.bind(this);
+
+    skeleton.on('update', this.updateMapping);
   }
 
   addShape(bone, def, rotation = null, translation = null, material = null) {
@@ -38,6 +40,34 @@ class SkeletonMapping extends THREE.Group {
 
     this._meshes.push({bone:this._skeleton.getBone(bone), mesh:s});
     this.add(s);
+  }
+
+  clone() {
+    let c = new SkeletonMapping(this._skeleton, this._material);
+
+    for (let m of this._meshes) {
+      let s = m.mesh.clone();
+      c._meshes.push({bone:m.bone, mesh: s});
+      c.add(s);
+    }
+
+    return c;
+  }
+
+  get skeleton() {
+    return this._skeleton;
+  }
+
+  set skeleton(skeleton) {
+    this._skeleton.removeListener('update', this.updateMapping);
+
+    this._skeleton = skeleton;
+
+    for (let m of this._meshes) {
+      m.bone = skeleton.getBone(m.bone.name);
+    }
+
+    this._skeleton.on('update', this.updateMapping);
   }
 
   updateMapping() {

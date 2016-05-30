@@ -53,11 +53,18 @@
 	    SkeletonMapping = __webpack_require__(138),
 	    shapes = __webpack_require__(136);
 
-	var skel = new Strandbeest();
+	var skel1 = new Strandbeest(),
+	    skel2 = new Strandbeest();
+
+	//
+	// Set initial rotation.
+	//
 
 	try {
-	  skel.set("rotation", 0);
-	  skel.check();
+	  skel1.set("rotation", 0);
+	  skel2.set("rotation", Math.PI);
+	  skel1.check();
+	  skel2.check();
 	} catch (err) {
 	  console.log(err);
 	}
@@ -69,12 +76,19 @@
 	    skelMesh = new THREE.Group(),
 	    showSkel = false;
 
+	var gridHelper = new THREE.GridHelper(150, 10);
+	gridHelper.translateZ(-75);
+	gridHelper.translateY(-92);
+	scene.add(gridHelper);
+
 	//
 	// Create the 3d Object
 	//
 
 	var shapeMaterial = new THREE.MeshLambertMaterial({
-	  color: 0xefefef,
+	  color: 0x2a51a3,
+	  emissive: 0x222222,
+	  emissiveIntensity: 0.5,
 	  wireframe: false
 	});
 
@@ -83,53 +97,43 @@
 
 	scene.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
 
-	var skelMapping = new SkeletonMapping(skel, shapeMaterial);
+	var skelMapping1 = new SkeletonMapping(skel1, shapeMaterial);
 
-	skelMapping.addShape("j", shapes.driveBarUpper, null, [0, 0, 3 * shapes.thickness]);
-	skelMapping.addShape("k", shapes.driveBarLower, null, [0, 0, 5 * shapes.thickness]);
-	skelMapping.addShape("c", shapes.legConnectorInside, null, [0, 0, 4 * shapes.thickness]);
-	skelMapping.addShape("f", shapes.legConnectorOutside, null, [0, 0, 4 * shapes.thickness]);
-	skelMapping.addShape("b", shapes.shoulder, null, [0, 0, 2 * shapes.thickness]);
-	skelMapping.addShape("m", shapes.driveWheelBar, null, [0, 0, 1 * shapes.thickness]);
-	skelMapping.addShape("g", shapes.foot, null, [0, 0, 2 * shapes.thickness]);
-	skelMapping.addShape("b", shapes.spacer, null, [0, 0, 1 * shapes.thickness]);
-	skelMapping.addShape("b", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
-	skelMapping.addShape("g", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
-	skelMapping.addShape("f", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping1.addShape("j", shapes.driveBarUpper, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping1.addShape("k", shapes.driveBarLower, null, [0, 0, 5 * shapes.thickness]);
+	skelMapping1.addShape("c", shapes.legConnectorInside, null, [0, 0, 4 * shapes.thickness]);
+	skelMapping1.addShape("f", shapes.legConnectorOutside, null, [0, 0, 4 * shapes.thickness]);
+	skelMapping1.addShape("b", shapes.shoulder, null, [0, 0, 2 * shapes.thickness]);
+	skelMapping1.addShape("m", shapes.driveWheelBar, null, [0, 0, 1 * shapes.thickness]);
+	skelMapping1.addShape("g", shapes.foot, null, [0, 0, 2 * shapes.thickness]);
+	skelMapping1.addShape("b", shapes.spacer, null, [0, 0, 1 * shapes.thickness]);
+	skelMapping1.addShape("b", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping1.addShape("g", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
+	skelMapping1.addShape("f", shapes.spacer, null, [0, 0, 3 * shapes.thickness]);
 
-	skelMapping.addShape("j'", shapes.driveBarUpper, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
-	skelMapping.addShape("k'", shapes.driveBarLower, [Math.PI, 0, 0], [0, 0, 4 * shapes.thickness]);
-	skelMapping.addShape("c'", shapes.legConnectorInside, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
-	skelMapping.addShape("f'", shapes.legConnectorOutside, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
-	skelMapping.addShape("b'", shapes.shoulder, [Math.PI, 0, 0], [0, 0, 3 * shapes.thickness]);
-	skelMapping.addShape("g'", shapes.foot, [Math.PI, 0, 0], [0, 0, 3 * shapes.thickness]);
-	skelMapping.addShape("b'", shapes.spacer, null, [0, 0, 1 * shapes.thickness]);
+	skelMapping1.addShape("j'", shapes.driveBarUpper, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
+	skelMapping1.addShape("k'", shapes.driveBarLower, [Math.PI, 0, 0], [0, 0, 4 * shapes.thickness]);
+	skelMapping1.addShape("c'", shapes.legConnectorInside, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
+	skelMapping1.addShape("f'", shapes.legConnectorOutside, [Math.PI, 0, 0], [0, 0, 2 * shapes.thickness]);
+	skelMapping1.addShape("b'", shapes.shoulder, [Math.PI, 0, 0], [0, 0, 3 * shapes.thickness]);
+	skelMapping1.addShape("g'", shapes.foot, [Math.PI, 0, 0], [0, 0, 3 * shapes.thickness]);
+	skelMapping1.addShape("b'", shapes.spacer, null, [0, 0, 1 * shapes.thickness]);
 
-	scene.add(skelMapping);
+	var skelMapping2 = skelMapping1.clone();
+	skelMapping2.translateZ(-50);
+	skelMapping2.skeleton = skel2;
 
-	/*var shapeMaterial2 = new THREE.MeshLambertMaterial({
-	  color: 0xff0000,
-	  wireframe: false
-	});
+	scene.add(skelMapping1);
+	scene.add(skelMapping2);
 
-	let s1 = new THREE.Mesh(shapes.foot.shape(), shapeMaterial)
-	  , s2 = new THREE.Mesh(shapes.foot.shape(), shapeMaterial2);
+	var clone1 = skelMapping1.clone(),
+	    clone2 = skelMapping2.clone();
 
-	s2.rotation.x = -Math.PI;
+	clone1.translateZ(-100);
+	clone2.translateZ(-150);
 
-	let g1 = new THREE.Group()
-	  , g2 = new THREE.Group();
-
-	g1.add(s1);
-	g2.add(s2);
-
-	g1.rotation.z = Math.PI / 2;
-	g2.rotation.z = Math.PI / 2;
-
-	g2.translateZ(10);
-
-	scene.add(g1);
-	scene.add(g2);*/
+	scene.add(clone1);
+	scene.add(clone2);
 
 	//
 	// Draw skeleton
@@ -141,7 +145,7 @@
 	    linewidth: 4
 	  });
 
-	  var _skelMesh = new SkeletonMesh(skel, skeletonMaterial);
+	  var _skelMesh = new SkeletonMesh(skel1, skeletonMaterial);
 	  scene.add(_skelMesh);
 	}
 
@@ -155,21 +159,13 @@
 
 	camera.position.y = -25;
 	camera.position.z = 125;
+	camera.lookAt(0, 0, 0);
 
 	var controls = new THREE.OrbitControls(camera, renderer.domElement);
 	//controls.addEventListener( 'change', render ); // add this only if there is no animation loop (requestAnimationFrame)
 	controls.enableDamping = true;
 	controls.dampingFactor = 0.25;
-	controls.enableZoom = false;
-
-	/*let controls = new THREE.TrackballControls(camera);
-	controls.rotateSpeed = 2.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = false;
-	controls.dynamicDampingFactor = 0.3;*/
+	controls.enableZoom = true;
 
 	window.addEventListener('resize', onWindowResize, false);
 
@@ -183,7 +179,7 @@
 	}
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setClearColor(0x21252b);
+	//renderer.setClearColor(0x21252b);
 	//renderer.setClearColor(0x282c34);
 
 	document.body.appendChild(renderer.domElement);
@@ -195,7 +191,8 @@
 	  controls.update();
 
 	  try {
-	    skel.set("rotation", skel.get("rotation") + 1 / fps);
+	    skel1.set("rotation", skel1.get("rotation") + 1 / fps);
+	    skel2.set("rotation", skel2.get("rotation") + 1 / fps);
 	  } catch (err) {
 	    console.log("Error", err);
 	  }
@@ -596,20 +593,23 @@
 	    _this.addArticulation("0", [0, 0]).addArticulation("1", function (skeleton) {
 	      return [15 * Math.cos(skeleton.get("rotation")), 15 * Math.sin(skeleton.get("rotation"))];
 	    }).addArticulation("2", [-38.0, -7.8]).addArticulation("3").addArticulation("4").addArticulation("5").addArticulation("6").addArticulation("2'", [38.0, -7.8]).addArticulation("3'").addArticulation("4'").addArticulation("5'").addArticulation("6'")
-	    //.addArticulation("7")
 	    //
 	    // Bones
 	    //
-	    .addBone("b", "2", "3", 41.5).addBone("c", "2", "4", 39.3).addBone("d", "2", "6", 40.1).addBone("e", "3", "6", 55.8).addBone("f", "5", "6", 39.4).addBone("g", "4", "5", 36.7).addBone("j", "1", "3", 50.0).addBone("k", "1", "4", 61.9).addBone("m", "0", "1", 15.0)
-	    //.addBone("a", 38.0)
-	    //.addBone("h", "5", "7", 65.7)
-	    //.addBone("i", "4", "7", 49.0)
-	    //.addBone("l", 7.8)
-	    .addBone("b'", "2'", "3'", 41.5).addBone("c'", "2'", "4'", 39.3).addBone("d'", "2'", "6'", 40.1).addBone("e'", "3'", "6'", 55.8).addBone("f'", "5'", "6'", 39.4).addBone("g'", "4'", "5'", 36.7).addBone("j'", "1", "3'", 50.0).addBone("k'", "1", "4'", 61.9)
+	    .addBone("b", "2", "3", 41.5).addBone("c", "2", "4", 39.3).addBone("d", "2", "6", 40.1).addBone("e", "3", "6", 55.8).addBone("f", "5", "6", 39.4).addBone("g", "4", "5", 36.7).addBone("j", "1", "3", 50.0).addBone("k", "1", "4", 61.9).addBone("m", "0", "1", 15.0).addBone("b'", "2'", "3'", 41.5).addBone("c'", "2'", "4'", 39.3).addBone("d'", "2'", "6'", 40.1).addBone("e'", "3'", "6'", 55.8).addBone("f'", "5'", "6'", 39.4).addBone("g'", "4'", "5'", 36.7).addBone("j'", "1", "3'", 50.0).addBone("k'", "1", "4'", 61.9)
 	    //
 	    // Triangles
 	    //
 	    .addTriangle("1", "2", "3").addTriangle("1", "4", "2").addTriangle("3", "2", "6").addTriangle("2", "4", "5").addTriangle("2", "5", "6").addTriangle("4", "5", "6").addTriangle("1", "3'", "2'").addTriangle("1", "2'", "4'").addTriangle("3'", "6'", "2'").addTriangle("2'", "5'", "4'").addTriangle("2'", "6'", "5'").addTriangle("4'", "6'", "5'");
+
+	    /*
+	    this
+	    .addArticulation("7")
+	    .addBone("a", 38.0)
+	    .addBone("h", "5", "7", 65.7)
+	    .addBone("i", "4", "7", 49.0)
+	    .addBone("l", 7.8)
+	    .addTriangle("4","7", "5")*/;
 	    return _this;
 	  }
 
@@ -5846,7 +5846,9 @@
 	    _this._material = material;
 	    _this._meshes = [];
 
-	    skeleton.on('update', _this.updateMapping.bind(_this));
+	    _this.updateMapping = _this.updateMapping.bind(_this);
+
+	    skeleton.on('update', _this.updateMapping);
 	    return _this;
 	  }
 
@@ -5885,8 +5887,10 @@
 	      this.add(s);
 	    }
 	  }, {
-	    key: 'updateMapping',
-	    value: function updateMapping() {
+	    key: 'clone',
+	    value: function clone() {
+	      var c = new SkeletonMapping(this._skeleton, this._material);
+
 	      var _iteratorNormalCompletion = true;
 	      var _didIteratorError = false;
 	      var _iteratorError = undefined;
@@ -5895,9 +5899,9 @@
 	        for (var _iterator = (0, _getIterator3.default)(this._meshes), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	          var m = _step.value;
 
-	          m.mesh.rotation.z = m.bone.rotation;
-	          m.mesh.position.x = m.bone.source.x;
-	          m.mesh.position.y = m.bone.source.y;
+	          var s = m.mesh.clone();
+	          c._meshes.push({ bone: m.bone, mesh: s });
+	          c.add(s);
 	        }
 	      } catch (err) {
 	        _didIteratorError = true;
@@ -5913,6 +5917,75 @@
 	          }
 	        }
 	      }
+
+	      return c;
+	    }
+	  }, {
+	    key: 'updateMapping',
+	    value: function updateMapping() {
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
+
+	      try {
+	        for (var _iterator2 = (0, _getIterator3.default)(this._meshes), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var m = _step2.value;
+
+	          m.mesh.rotation.z = m.bone.rotation;
+	          m.mesh.position.x = m.bone.source.x;
+	          m.mesh.position.y = m.bone.source.y;
+	        }
+	      } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
+	          }
+	        } finally {
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'skeleton',
+	    get: function get() {
+	      return this._skeleton;
+	    },
+	    set: function set(skeleton) {
+	      this._skeleton.removeListener('update', this.updateMapping);
+
+	      this._skeleton = skeleton;
+
+	      var _iteratorNormalCompletion3 = true;
+	      var _didIteratorError3 = false;
+	      var _iteratorError3 = undefined;
+
+	      try {
+	        for (var _iterator3 = (0, _getIterator3.default)(this._meshes), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	          var m = _step3.value;
+
+	          m.bone = skeleton.getBone(m.bone.name);
+	        }
+	      } catch (err) {
+	        _didIteratorError3 = true;
+	        _iteratorError3 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	            _iterator3.return();
+	          }
+	        } finally {
+	          if (_didIteratorError3) {
+	            throw _iteratorError3;
+	          }
+	        }
+	      }
+
+	      this._skeleton.on('update', this.updateMapping);
 	    }
 	  }]);
 	  return SkeletonMapping;
