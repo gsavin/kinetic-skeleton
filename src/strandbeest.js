@@ -1,7 +1,8 @@
 'use strict';
 
-const Skeleton  = require('./skeleton')
-    , shapes    = require('./shapes');
+const Skeleton        = require('./skeleton')
+    , shapes          = require('./shapes')
+    , SkeletonMapping = require('./skeleton-mapping');
 
 class Strandbeest extends Skeleton {
   constructor() {
@@ -69,6 +70,45 @@ class Strandbeest extends Skeleton {
       .addBone("i", "4", "7", 49.0)
       .addBone("l", 7.8)
       .addTriangle("4","7", "5")*/;
+    }
+
+    getMapping(shapeMaterial = null) {
+      if (shapeMaterial == null) {
+        shapeMaterial = new THREE.MeshLambertMaterial({
+          color: 0x2a51a3,
+          emissive: 0x222222,
+          emissiveIntensity: 0.5,
+          wireframe: false
+        });
+      }
+
+      let skelMapping1 = new SkeletonMapping(this, shapeMaterial);
+
+      shapes.support(geometry => {
+        skelMapping1.add(new THREE.Mesh(geometry, shapeMaterial));
+      });
+      
+      skelMapping1.addShape("j", shapes.driveBarUpper          , null              , [0, 0, 3 * shapes.thickness]);
+      skelMapping1.addShape("k", shapes.driveBarLower          , null              , [0, 0, 5 * shapes.thickness]);
+      skelMapping1.addShape("c", shapes.legConnectorInside     , null              , [0, 0, 4 * shapes.thickness]);
+      skelMapping1.addShape("f", shapes.legConnectorOutside    , null              , [0, 0, 3 * shapes.thickness]);
+      skelMapping1.addShape("b", shapes.shoulder               , null              , [0, 0, 2 * shapes.thickness]);
+      skelMapping1.addShape("m", shapes.driveWheelBar          , null              , [0, 0, 1 * shapes.thickness]);
+      skelMapping1.addShape("g", shapes.foot                   , null              , [0, 0, 2 * shapes.thickness]);
+      skelMapping1.addShape("b", shapes.spacer                 , null              , [0, 0, 1 * shapes.thickness]);
+      skelMapping1.addShape("b", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+      skelMapping1.addShape("g", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+      //skelMapping1.addShape("f", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+
+      skelMapping1.addShape("j'", shapes.driveBarUpper         , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
+      skelMapping1.addShape("k'", shapes.driveBarLower         , [Math.PI, 0, 0]   , [0, 0, 4 * shapes.thickness]);
+      skelMapping1.addShape("c'", shapes.legConnectorInside    , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
+      skelMapping1.addShape("f'", shapes.legConnectorOutside   , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
+      skelMapping1.addShape("b'", shapes.shoulder              , [Math.PI, 0, 0]   , [0, 0, 3 * shapes.thickness]);
+      skelMapping1.addShape("g'", shapes.foot                  , [Math.PI, 0, 0]   , [0, 0, 3 * shapes.thickness]);
+      skelMapping1.addShape("b'", shapes.spacer                , null              , [0, 0, 1 * shapes.thickness]);
+
+      return skelMapping1;
     }
 }
 

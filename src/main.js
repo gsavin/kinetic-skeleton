@@ -34,7 +34,7 @@ const scene     = new THREE.Scene()
 
 
 let gridHelper = new THREE.GridHelper(150, 10);
-gridHelper.translateZ(-75);
+//gridHelper.translateZ(-75);
 gridHelper.translateY(-92);
 scene.add(gridHelper);
 
@@ -42,8 +42,15 @@ scene.add(gridHelper);
 // Create the 3d Object
 //
 
-var shapeMaterial = new THREE.MeshLambertMaterial({
+let shapeMaterial = new THREE.MeshLambertMaterial({
   color: 0x2a51a3,
+  emissive: 0x222222,
+  emissiveIntensity: 0.5,
+  wireframe: false
+});
+
+let alertMaterial = new THREE.MeshLambertMaterial({
+  color: 0xb82523,
   emissive: 0x222222,
   emissiveIntensity: 0.5,
   wireframe: false
@@ -52,45 +59,26 @@ var shapeMaterial = new THREE.MeshLambertMaterial({
 shapeMaterial.transparent = true;
 shapeMaterial.opacity = 0.75;
 
-let skelMapping1 = new SkeletonMapping(skel1, shapeMaterial);
+let skelMapping1 = skel1.getMapping(shapeMaterial);
+skelMapping1.translateZ(75);
 
-skelMapping1.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
+skelMapping1.onceLoaded(function() {
+  let skelMapping2 = skelMapping1.clone();
+  skelMapping2.translateZ(25);
+  skelMapping2.skeleton = skel2;
 
-skelMapping1.addShape("j", shapes.driveBarUpper          , null              , [0, 0, 3 * shapes.thickness]);
-skelMapping1.addShape("k", shapes.driveBarLower          , null              , [0, 0, 5 * shapes.thickness]);
-skelMapping1.addShape("c", shapes.legConnectorInside     , null              , [0, 0, 4 * shapes.thickness]);
-skelMapping1.addShape("f", shapes.legConnectorOutside    , null              , [0, 0, 4 * shapes.thickness]);
-skelMapping1.addShape("b", shapes.shoulder               , null              , [0, 0, 2 * shapes.thickness]);
-skelMapping1.addShape("m", shapes.driveWheelBar          , null              , [0, 0, 1 * shapes.thickness]);
-skelMapping1.addShape("g", shapes.foot                   , null              , [0, 0, 2 * shapes.thickness]);
-skelMapping1.addShape("b", shapes.spacer                 , null              , [0, 0, 1 * shapes.thickness]);
-skelMapping1.addShape("b", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
-skelMapping1.addShape("g", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
-skelMapping1.addShape("f", shapes.spacer                 , null              , [0, 0, 3 * shapes.thickness]);
+  scene.add(skelMapping1);
+  scene.add(skelMapping2);
 
-skelMapping1.addShape("j'", shapes.driveBarUpper         , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
-skelMapping1.addShape("k'", shapes.driveBarLower         , [Math.PI, 0, 0]   , [0, 0, 4 * shapes.thickness]);
-skelMapping1.addShape("c'", shapes.legConnectorInside    , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
-skelMapping1.addShape("f'", shapes.legConnectorOutside   , [Math.PI, 0, 0]   , [0, 0, 2 * shapes.thickness]);
-skelMapping1.addShape("b'", shapes.shoulder              , [Math.PI, 0, 0]   , [0, 0, 3 * shapes.thickness]);
-skelMapping1.addShape("g'", shapes.foot                  , [Math.PI, 0, 0]   , [0, 0, 3 * shapes.thickness]);
-skelMapping1.addShape("b'", shapes.spacer                , null              , [0, 0, 1 * shapes.thickness]);
+  let clone1 = skelMapping1.clone()
+    , clone2 = skelMapping2.clone();
 
-let skelMapping2 = skelMapping1.clone();
-skelMapping2.translateZ(-50);
-skelMapping2.skeleton = skel2;
+  clone1.translateZ(-25);
+  clone2.translateZ(-75);
 
-scene.add(skelMapping1);
-scene.add(skelMapping2);
-
-let clone1 = skelMapping1.clone()
-  , clone2 = skelMapping2.clone();
-
-clone1.translateZ(-100);
-clone2.translateZ(-150);
-
-scene.add(clone1);
-scene.add(clone2);
+  scene.add(clone1);
+  scene.add(clone2);
+});
 
 //
 // Draw skeleton
