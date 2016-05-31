@@ -95,9 +95,9 @@
 	shapeMaterial.transparent = true;
 	shapeMaterial.opacity = 0.75;
 
-	scene.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
-
 	var skelMapping1 = new SkeletonMapping(skel1, shapeMaterial);
+
+	skelMapping1.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
 
 	skelMapping1.addShape("j", shapes.driveBarUpper, null, [0, 0, 3 * shapes.thickness]);
 	skelMapping1.addShape("k", shapes.driveBarLower, null, [0, 0, 5 * shapes.thickness]);
@@ -5889,7 +5889,8 @@
 	  }, {
 	    key: 'clone',
 	    value: function clone() {
-	      var c = new SkeletonMapping(this._skeleton, this._material);
+	      var c = new SkeletonMapping(this._skeleton, this._material),
+	          t = [];
 
 	      var _iteratorNormalCompletion = true;
 	      var _didIteratorError = false;
@@ -5900,8 +5901,11 @@
 	          var m = _step.value;
 
 	          var s = m.mesh.clone();
+
 	          c._meshes.push({ bone: m.bone, mesh: s });
 	          c.add(s);
+
+	          t.push(m.mesh.id);
 	        }
 	      } catch (err) {
 	        _didIteratorError = true;
@@ -5918,22 +5922,18 @@
 	        }
 	      }
 
-	      return c;
-	    }
-	  }, {
-	    key: 'updateMapping',
-	    value: function updateMapping() {
 	      var _iteratorNormalCompletion2 = true;
 	      var _didIteratorError2 = false;
 	      var _iteratorError2 = undefined;
 
 	      try {
-	        for (var _iterator2 = (0, _getIterator3.default)(this._meshes), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	          var m = _step2.value;
+	        for (var _iterator2 = (0, _getIterator3.default)(this.children), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var child = _step2.value;
 
-	          m.mesh.rotation.z = m.bone.rotation;
-	          m.mesh.position.x = m.bone.source.x;
-	          m.mesh.position.y = m.bone.source.y;
+	          if (t.indexOf(child.id) < 0) {
+	            t.push(child.id);
+	            c.add(child.clone());
+	          }
 	        }
 	      } catch (err) {
 	        _didIteratorError2 = true;
@@ -5949,17 +5949,12 @@
 	          }
 	        }
 	      }
+
+	      return c;
 	    }
 	  }, {
-	    key: 'skeleton',
-	    get: function get() {
-	      return this._skeleton;
-	    },
-	    set: function set(skeleton) {
-	      this._skeleton.removeListener('update', this.updateMapping);
-
-	      this._skeleton = skeleton;
-
+	    key: 'updateMapping',
+	    value: function updateMapping() {
 	      var _iteratorNormalCompletion3 = true;
 	      var _didIteratorError3 = false;
 	      var _iteratorError3 = undefined;
@@ -5968,7 +5963,9 @@
 	        for (var _iterator3 = (0, _getIterator3.default)(this._meshes), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 	          var m = _step3.value;
 
-	          m.bone = skeleton.getBone(m.bone.name);
+	          m.mesh.rotation.z = m.bone.rotation;
+	          m.mesh.position.x = m.bone.source.x;
+	          m.mesh.position.y = m.bone.source.y;
 	        }
 	      } catch (err) {
 	        _didIteratorError3 = true;
@@ -5981,6 +5978,41 @@
 	        } finally {
 	          if (_didIteratorError3) {
 	            throw _iteratorError3;
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'skeleton',
+	    get: function get() {
+	      return this._skeleton;
+	    },
+	    set: function set(skeleton) {
+	      this._skeleton.removeListener('update', this.updateMapping);
+
+	      this._skeleton = skeleton;
+
+	      var _iteratorNormalCompletion4 = true;
+	      var _didIteratorError4 = false;
+	      var _iteratorError4 = undefined;
+
+	      try {
+	        for (var _iterator4 = (0, _getIterator3.default)(this._meshes), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	          var m = _step4.value;
+
+	          m.bone = skeleton.getBone(m.bone.name);
+	        }
+	      } catch (err) {
+	        _didIteratorError4 = true;
+	        _iteratorError4 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+	            _iterator4.return();
+	          }
+	        } finally {
+	          if (_didIteratorError4) {
+	            throw _iteratorError4;
 	          }
 	        }
 	      }

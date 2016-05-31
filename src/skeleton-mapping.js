@@ -43,12 +43,23 @@ class SkeletonMapping extends THREE.Group {
   }
 
   clone() {
-    let c = new SkeletonMapping(this._skeleton, this._material);
+    let c = new SkeletonMapping(this._skeleton, this._material)
+      , t = [];
 
     for (let m of this._meshes) {
       let s = m.mesh.clone();
+
       c._meshes.push({bone:m.bone, mesh: s});
       c.add(s);
+
+      t.push(m.mesh.id);
+    }
+
+    for (let child of this.children) {
+      if (t.indexOf(child.id) < 0) {
+        t.push(child.id);
+        c.add(child.clone());
+      }
     }
 
     return c;

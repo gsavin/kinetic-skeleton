@@ -52,9 +52,9 @@ var shapeMaterial = new THREE.MeshLambertMaterial({
 shapeMaterial.transparent = true;
 shapeMaterial.opacity = 0.75;
 
-scene.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
-
 let skelMapping1 = new SkeletonMapping(skel1, shapeMaterial);
+
+skelMapping1.add(new THREE.Mesh(shapes.support.shape(), shapeMaterial));
 
 skelMapping1.addShape("j", shapes.driveBarUpper          , null              , [0, 0, 3 * shapes.thickness]);
 skelMapping1.addShape("k", shapes.driveBarLower          , null              , [0, 0, 5 * shapes.thickness]);
